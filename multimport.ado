@@ -5,6 +5,7 @@ syntax [using], ///
 	[ ///
 		DIRectory(string) ///
 		IMPORToptions(string asis) ///
+		APPENDoptions(string asis) ///
 		exclude(string asis) ///
 		force clear ///
 	]
@@ -56,13 +57,17 @@ if "`force'" != "force" {
 * Import and append
 *-------------------------------------------------------------------------------
 
+// Create final dataset
+clear
 tempfile something
+qui save `something', emptyok
 
 // Import all files
 foreach f of local files {
-	di as text "importing '`f''"
+	di as text "importing '`f''..."
 	import delimited "Data/Raw/Mineduc/Docentes/`f'" , `importoptions'
-	append using `something'
+	append using `something' , `appendoptions'
+	qui save `something', replace 
 }
 
 end
