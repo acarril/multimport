@@ -1,4 +1,4 @@
-cap program drop multimport
+*! 0.1 Alvaro Carril 14feb2018
 program define multimport
 syntax [using], ///
 	DIRectory(string) EXTensions(string) [IMPORToptions(string asis) force]
@@ -7,16 +7,18 @@ syntax [using], ///
 * Parse program input
 *-------------------------------------------------------------------------------
 
+if "`clear'" != "clear" {
 
+}
 
 *-------------------------------------------------------------------------------
-* Parse program option
+* Parse program options
 *-------------------------------------------------------------------------------
 
 // Parse files to import, collecting all files with `extensions' of `directory'
 foreach ext of local extensions {
 	local add : dir "`directory'" files "*.`ext'", respectcase
-	local files `files' `add'
+	local files `files' `"`add'"' 
 }
 
 // List files to import and confirm
@@ -31,6 +33,13 @@ if "`force'" != "force" {
 		exit
 	}
 }
+
+
+*-------------------------------------------------------------------------------
+* Import and append
+*-------------------------------------------------------------------------------
+
+// Create empty dataset
 
 // Import all files
 foreach f of local files {
