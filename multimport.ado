@@ -79,12 +79,21 @@ clear
 tempfile alldata
 qui save `alldata', emptyok
 
-// Import all files
+// Create dataset with all data sources
 foreach f of local files {
 	di as text "importing '`f''..."
+	// Import
 	import `importmethod' "`directory'`f'" , `importoptions'
+	// Generate _filename variable identifying data source
+	local i = `i' + 1
+	local valuelabs `valuelabs' `i' `"`f'"'
+	gen _filename = `i'
+	// Append with accumulated data
 	append using `alldata' , `appendoptions'
 	qui save `alldata', replace 
 }
+// Define and apply value label to _filename
+label define _filename `valuelabs'
+label values _filename _filename
 
 end
