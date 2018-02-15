@@ -1,6 +1,6 @@
 *! 1.0 Alvaro Carril 14feb2018
 program define multimport, rclass
-syntax [using], ///
+syntax anything(name=importmethod id="import method") [using], ///
 	[ ///
 		EXTensions(string) ///
 		DIRectory(string) ///
@@ -14,6 +14,12 @@ syntax [using], ///
 *-------------------------------------------------------------------------------
 * Check valid program input
 *-------------------------------------------------------------------------------
+
+// Check valid importmethod
+if "`importmethod'" != "excel" & "`importmethod'" != "delimited" {
+	di as error `"multimport: unknown subcommand "`importmethod'""'
+	exit 198
+}
 
 // Assert that either extension() or include() are specified
 if "`extensions'" == "" & `"`include'"' == "" {
@@ -64,22 +70,21 @@ if "`clear'" == "clear" & `clearpos' == 0  {
 }
 
 
-
 *-------------------------------------------------------------------------------
 * Import and append
 *-------------------------------------------------------------------------------
 
 // Create final dataset
 clear
-tempfile something
-qui save `something', emptyok
+tempfile alldata
+qui save `alldata', emptyok
 
 // Import all files
 foreach f of local files {
 	di as text "importing '`f''..."
-	import delimited "`directory'`f'" , `importoptions'
-	append using `something' , `appendoptions'
-	qui save `something', replace 
+	import `importmethod' "`directory'`f'" , `importoptions'
+	append using `alldata' , `appendoptions'
+	qui save `alldata', replace 
 }
 
 end
