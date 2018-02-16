@@ -39,16 +39,13 @@
 {phang}
 {it:filespec} is any valid Mac, Unix, or Windows path (see {helpb dir:[D] dir}){p_end}
 
-{phang}
-{it:ext#} is any file extension{p_end}
-
 
 {marker opt_summary}{...}
 {synoptset 36 tabbed}{...}
 {synopthdr}
 {synoptline}
 {p2coldent:* {opth dir:ectory(dir:filespec)}}directory of files to import; if not specified, it defaults to the current working directory{p_end}
-{p2coldent:+ {opth ext:ension(multimport##extension:ext1 [ext2 ...])}}extension(s) of files to import{p_end}
+{synopt : {opth ext:ension(multimport##extension:ext1 [ext2 ...])}}override file extension(s) scanned in {opt directory(filespec)}; if not specified, sensible defaults are inferred from {it:import_method}{p_end}
 {p2coldent:* {opth in:clude(filename:file1 [file2 ...])}}specific filenames to import{p_end}
 {synopt : {opth ex:clude(filename:file1 [file2 ...])}}specific filenames to exclude from import{p_end}
 {synopt : {opth import:options(import:import_method_opts)}}pass options to {helpb import:[D] import {it:import_method}}{p_end}
@@ -58,39 +55,23 @@
 {synoptline}
 {p2colreset}{...}
 {p 4 6 2}* {opt directory(filespec)} and/or {opt include(file1 [file2 ...])} are required.{p_end}
-{p 4 6 2}+ {opt extension(ext1 [ext2 ...])} is required if {opt include(file1 [file2 ...])} is not specified.{p_end}
-{p 4 6 2}{it:indepvars}, {it:endogvars} and {it:iv_vars} may contain factor variables; see {help fvvarlist}.{p_end}
-{p 4 6 2}all the regression variables may contain time-series operators; see {help tsvarlist}.{p_end}
-{p 4 6 2}{cmd:fweight}s, {cmd:aweight}s and {cmd:pweight}s are allowed; see {help weight}.{p_end}
-{p 4 6 2}{it:filespec} is any valid Mac, Unix, or Windows file path (see {help dir:dir}).{p_end}
 
-
-{marker absvar}{...}
-{title:Absvar Syntax}
-
-{synoptset 22}{...}
-{synopthdr:absvar}
-{synoptline}
-{synopt:{cmd:i.}{it:varname}}categorical variable to be absorbed (the {cmd:i.} prefix is tacit){p_end}
-{synopt:{cmd:i.}{it:var1}{cmd:#i.}{it:var2}}absorb the interactions of multiple categorical variables{p_end}
-{synopt:{cmd:i.}{it:var1}{cmd:#}{cmd:c.}{it:var2}}absorb heterogeneous slopes, where {it:var2} has a different slope coef. depending on the category of {it:var1}{p_end}
-{synopt:{it:var1}{cmd:##}{cmd:c.}{it:var2}}equivalent to "{cmd:i.}{it:var1} {cmd:i.}{it:var1}{cmd:#}{cmd:c.}{it:var2}", but {it:much} faster{p_end}
-{synopt:{it:var1}{cmd:##c.(}{it:var2 var3}{cmd:)}}multiple heterogeneous slopes are allowed together. Alternative syntax: {it:var1}{cmd:##(c.}{it:var2} {cmd:c.}{it:var3}{cmd:)}{p_end}
-{synopt:{it:v1}{cmd:#}{it:v2}{cmd:#}{it:v3}{cmd:##c.(}{it:v4 v5}{cmd:)}}factor operators can be combined{p_end}
-{synoptline}
-{p2colreset}{...}
-{p 4 6 2}To save the estimates specific absvars, write {newvar}{inp:={it:absvar}}.{p_end}
-{p 4 6 2}Please be aware that in most cases these estimates are neither consistent nor econometrically identified.{p_end}
-{p 4 6 2}Using categorical interactions (e.g. {it:x}{cmd:#}{it:z}) is faster than running {it:egen group(...)} beforehand.{p_end}
-{p 4 6 2}Singleton obs. are dropped iteratively until no more singletons are found (see ancilliary article for details).{p_end}
-{p 4 6 2}Slope-only absvars ("state#c.time") have poor numerical stability and slow convergence.
-If you need those, either i) increase tolerance or
-ii) use slope-and-intercept absvars ("state##c.time"), even if the intercept is redundant.
-For instance if absvar is "i.zipcode i.state##c.time" then i.state is redundant given i.zipcode, but
-convergence will still be {it:much} faster.{p_end}
 
 {marker description}{...}
 {title:Description}
+
+{pstd}
+{cmd:multimport} is a simple tool for importing multiple non-Stata data into memory, appending them automatically.
+According to the specified {it:import_method}, it works similarly to {help import_delimited:import delimited} or {help import_excel:import excel}.
+However, it automatically scans the directory specified in {opt directory(filespec)}, looking for all files with extensions that are inferred from {it:import_method} (e.g. *.xls and *.xlsx files for {cmd:multimport excel}).
+
+{pstd}
+{cmd:multimport} will list all files that will be imported and ask the user for confirmation before continuing, unless the {opt force} option is specified to override this prompt.
+The program will import and append all listed files, generating a new variable {cmd:_filename} indicating the source filename.
+Additional optiones may be passed to {helpb import:[D] import {it:import_method}} and {helpb append:[D] append} using {opt importoptions(import_method_opts)} and {opt appendoptions(append_opts)}, respectively.
+
+{pstd}
+Additional files may be specifically included with the {opt include(file1 [file2 ...])} option, and specific files may be excludede via the {opt exclude(file1 [file2 ...])} option.
 
 {pstd}
 {cmd:multimport} is a generalization of {help areg} (and {help xtreg:xtreg,fe}, {help xtivreg:xtivreg,fe}) for multiple levels of fixed effects
