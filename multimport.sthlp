@@ -25,82 +25,44 @@
 {p2col :{cmd:multimport} {hline 1}}Import and append multiple excel or delimited files{p_end}
 {p2colreset}{...}
 
+
 {marker syntax}{...}
 {title:Syntax}
 
 {p 8 15 2} {cmd:multimport}
-{depvar} [{indepvars}] [{cmd:(}{it:{help varlist:endogvars}} {cmd:=} {it:{help varlist:iv_vars}}{cmd:)}]
-{ifin} {it:{weight}} {cmd:,} {opth a:bsorb(multimport##absvar:absvars)} [{help multimport##options:options}] {p_end}
+{cmd:}{it:{help import:import_method}}
+{cmd:,} [{opth dir:ectory(dir:filespec)} {opth ext:ension(multimport##extension:ext1 [ext2 ...])} {opth in:clude(filename:file1 [file2 ...])} {help multimport##options:options}] {p_end}
 
-{p 8 15 2} {cmd:multimport}
-{cmd:}{it:{help import:import_method}} [{indepvars}] [{cmd:(}{it:{help varlist:endogvars}} {cmd:=} {it:{help varlist:iv_vars}}{cmd:)}]
-{ifin} {it:{weight}} {cmd:,} {opth a:bsorb(multimport##absvar:absvars)} [{help multimport##options:options}] {p_end}
+{phang}
+{it:import_method} is the method to use for reading non-Stata data into memory (see {helpb import:[D] import}); currently {cmd:delimited} and {cmd:excel} are supported{p_end}
+
+{phang}
+{it:filespec} is any valid Mac, Unix, or Windows path (see {helpb dir:[D] dir}){p_end}
+
+{phang}
+{it:ext#} is any file extension{p_end}
+
 
 {marker opt_summary}{...}
-{synoptset 22 tabbed}{...}
+{synoptset 36 tabbed}{...}
 {synopthdr}
 {synoptline}
-{syntab:Model {help multimport##opt_model:[+]}}
-{p2coldent:* {opth a:bsorb(multimport##absvar:absvars)}}identifiers of the absorbed fixed effects; each {help multimport##absvar:absvar} represents one set of fixed effects{p_end}
-{synopt: {cmdab:a:bsorb(}{it:...}{cmd:,} {cmdab:save:fe)}}save all fixed effect estimates ({it:__hdfe*} prefix); useful for a subsequent {help multimport##postestimation:predict}.
-However, see also the {it:resid} option.{p_end}
-{synopt : {opth res:iduals(newvar)}}save residuals; more direct and much faster than saving the fixed effects and then running predict{p_end}
-{synopt :{opth su:mmarize(tabstat##statname:stats)}}equivalent to {help multimport##postestimation:estat summarize} after the regression,
-but more flexible, compatible with the {opt fast:} option, and saves results on {it:e(summarize)}{p_end}
-{synopt : {opt subopt:ions(...)}}additional options that will be passed to the regression command (either {help regress}, {help ivreg2}, or {help ivregress}){p_end}
-	
-{syntab:SE/Robust {help multimport##opt_vce:[+]}}
-{p2coldent:+ {opt vce}{cmd:(}{help multimport##opt_vce:vcetype} [{cmd:,}{it:opt}]{cmd:)}}{it:vcetype}
-may be {opt un:adjusted} (default), {opt r:obust} or {opt cl:uster} {help fvvarlist} (allowing two- and multi-way clustering){p_end}
-{synopt :}suboptions {opt bw(#)}, {opt ker:nel(str)}, {opt dkraay(#)} and {opt kiefer} allow for AC/HAC estimates; see the {help avar} package{p_end}
-
-{syntab:Instrumental-Variable/2SLS/GMM {help multimport##opt_iv:[+]}}
-{synopt :{opt est:imator(str)}}either {opt 2sls} (default), {opt gmm:2s} (two-stage GMM),
-{opt liml} (limited-information maximum likelihood) or {opt cue} (which gives approximate results, see discussion below){p_end}
-{synopt :{opt stage:s(list)}}estimate additional regressions; choose any of {opt first} {opt ols} {opt reduced} {opt acid} (or {opt all}){p_end}
-{synopt :{opt ff:irst}}compute first-stage diagnostic and identification statistics{p_end}
-{synopt :{opth iv:suite(subcmd)}}package used in the IV/GMM regressions;
-options are {opt ivreg2} (default; needs installing) and {opt ivregress}{p_end}
-
-{syntab:Diagnostic {help multimport##opt_diagnostic:[+]}}
-{synopt :{opt v:erbose(#)}}amount of debugging information to show (0=None, 1=Some, 2=More, 3=Parsing/convergence details, 4=Every iteration){p_end}
-{synopt :{opt time:it}}show elapsed times by stage of computation{p_end}
-
-{syntab:Optimization {help multimport##opt_optimization:[+]}}
-{p2coldent:+ {opth tol:erance(#)}}criterion for convergence (default=1e-8){p_end}
-{synopt :{opth maxit:erations(#)}}maximum number of iterations (default=10,000); if set to missing ({cmd:.}) it will run for as long as it takes.{p_end}
-{synopt :{opth pool:size(#)}}apply the within algorithm in groups of {it:#} variables (default 10). a large poolsize is usually faster but uses more memory{p_end}
-{synopt :{opt accel:eration(str)}}acceleration method; options are conjugate_gradient (cg), steep_descent (sd), aitken (a), and none (no){p_end}
-{synopt :{opt transf:orm(str)}}transform operation that defines the type of alternating projection; options are Kaczmarz (kac), Cimmino (cim), Symmetric Kaczmarz (sym){p_end}
-
-{syntab:Speedup Tricks {help multimport##opt_speedup:[+]}}
-{synopt :{cmd: cache(save} [,opt]{cmd:)}}absorb all variables without regressing (destructive; combine it with {help preserve:preserve/restore}){p_end}
-{synopt :}suboption {opth keep(varlist)} adds additional untransformed variables to the resulting dataset{p_end}
-{synopt :{cmd: cache(use)}}run regressions on cached data; {it:vce()} must be the same as with {cmd: cache(save)}.{p_end}
-{synopt :{cmd: cache(clear)}}delete Mata objects to clear up memory; no more regressions can be run after this{p_end}
-{synopt :{opt fast}}will not create {it:e(sample)}; disabled when saving fixed effects, residuals or mobility groups{p_end}
-
-{syntab:Degrees-of-Freedom Adjustments {help multimport##opt_dof:[+]}}
-{synopt :{opt dof:adjustments(list)}}allows selecting the desired adjustments for degrees of freedom;
-rarely used{p_end}
-{synopt: {opth groupv:ar(newvar)}}unique identifier for the first mobility group{p_end}
-
-{syntab:Reporting {help multimport##opt_reporting:[+]}}
-{synopt :{opt version:}}reports the version number and date of multimport, and saves it in e(version). standalone option{p_end}
-{synopt :{opt l:evel(#)}}set confidence level; default is {cmd:level(95)}{p_end}
-{synopt :{it:{help multimport##display_options:display_options}}}control column formats, row spacing, line width, display of omitted variables and base and empty cells, and factor-variable labeling.{p_end}
-{synopt :}particularly useful are the {opt noomit:ted} and {opt noempty} options to hide regressors omitted due to collinearity{p_end}
-
-{syntab:Undocumented}
-{synopt :{opt keepsin:gletons}}do not drop singleton groups{p_end}
-{synopt :{opt old}}will call the latest 2.x version of multimport instead (see the {help multimport_old:old help file}){p_end}
+{p2coldent:* {opth dir:ectory(dir:filespec)}}directory of files to import; if not specified, it defaults to the current working directory{p_end}
+{p2coldent:+ {opth ext:ension(multimport##extension:ext1 [ext2 ...])}}extension(s) of files to import{p_end}
+{p2coldent:* {opth in:clude(filename:file1 [file2 ...])}}specific filenames to import{p_end}
+{synopt : {opth ex:clude(filename:file1 [file2 ...])}}specific filenames to exclude from import{p_end}
+{synopt : {opth import:options(import:import_method_opts)}}pass options to {helpb import:[D] import {it:import_method}}{p_end}
+{synopt : {opth append:options(append:append_method_opts)}}pass options to {helpb append:[D] append}{p_end}
+{synopt :{opt force}}skip user confirmation prompt{p_end}
+{synopt :{opt clear}}replace data in memory{p_end}
 {synoptline}
 {p2colreset}{...}
-{p 4 6 2}* {opt absorb(absvars)} is required.{p_end}
-{p 4 6 2}+ indicates a recommended or important option.{p_end}
+{p 4 6 2}* {opt directory(filespec)} and/or {opt include(file1 [file2 ...])} are required.{p_end}
+{p 4 6 2}+ {opt extension(ext1 [ext2 ...])} is required if {opt include(file1 [file2 ...])} is not specified.{p_end}
 {p 4 6 2}{it:indepvars}, {it:endogvars} and {it:iv_vars} may contain factor variables; see {help fvvarlist}.{p_end}
 {p 4 6 2}all the regression variables may contain time-series operators; see {help tsvarlist}.{p_end}
 {p 4 6 2}{cmd:fweight}s, {cmd:aweight}s and {cmd:pweight}s are allowed; see {help weight}.{p_end}
+{p 4 6 2}{it:filespec} is any valid Mac, Unix, or Windows file path (see {help dir:dir}).{p_end}
 
 
 {marker absvar}{...}
