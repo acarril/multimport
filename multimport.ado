@@ -23,7 +23,7 @@ if "`importmethod'" != "excel" & "`importmethod'" != "delimited" {
 
 // Assert that either directory() or include() are specified
 if "`directory'" == "" & `"`include'"' == "" {
-	di as error "you must either specify an directory() or specific files to include()"
+	di as error "you must either specify a directory() or specific files to include()"
 	exit 198
 }
 
@@ -38,30 +38,40 @@ if `c(changed)' == 1 & ("`clear'" != "clear" & `clearpos' == 0) {
 * Parse program options
 *-------------------------------------------------------------------------------
 
-// Add default extensions according to import_method, if they weren't specified
-if "`extensions'" == "" {
-	if "`importmethod'" == 	   "excel" 	local extensions xls xlsx
-	if "`importmethod'" == "delimited" 	local extensions csv
+// Import all files from directory() if specified
+if "`directory'" != ""{
+	// Check if directory=="." (current directory), then empty local
+	if "`directory'" == "." local directory 
+
+	// Add final forward slash to directory if not empty and it doesn't have it
+	local lastdirchar = substr("`directory'", -1, .)
+	if "`lastdirchar'" != "/" & "`directory'" != "" local directory `directory'/
+
+	// Add default extensions according to import_method, if they weren't specified
+	if "`extensions'" == "" {
+		if "`importmethod'" == 	   "excel" 	local extensions xls xlsx
+		if "`importmethod'" == "delimited" 	local extensions csv
+	}
+
+	// Parse files to import, collecting all files with `extensions' of `directory'
+	foreach ext of local extensions {
+		local add : dir "`directory'" files "*.`ext'", respectcase
+		local files `files' `"`add'"'
+	}
 }
 
-// Parse files to import, collecting all files with `extensions' of `directory'
-foreach ext of local extensions {
-	local add : dir "`directory'" files "*.`ext'", respectcase
-	local files `files' `"`add'"'
-}
-
-// Include any specific files
+// Include any specific (possibly additional) files
 local files : list files | include
 
 // Exclude any specific files
 local files : list files - exclude
 
-// Check if directory=="." (current directory), then empty local
-if "`directory'" == "." local directory 
-
-// Add final forward slash to directory if not empty and it doesn't have it
-local lastdirchar = substr("`directory'", -1, .)
-if "`lastdirchar'" != "/" & "`directory'" != "" local directory `directory'/
+// Check that final files list is not empty
+local Nfiles : list sizeof files
+if `Nfiles' == 0 {
+	di as error "no files to import"
+	exit 198
+}
 
 // List files to import and confirm
 if "`force'" != "force" {
