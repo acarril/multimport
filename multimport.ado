@@ -21,9 +21,9 @@ if "`importmethod'" != "excel" & "`importmethod'" != "delimited" {
 	exit 198
 }
 
-// Assert that either extension() or include() are specified
-if "`extensions'" == "" & `"`include'"' == "" {
-	di as error "you must either specify an extension() or specific files to include()"
+// Assert that either directory() or include() are specified
+if "`directory'" == "" & `"`include'"' == "" {
+	di as error "you must either specify an directory() or specific files to include()"
 	exit 198
 }
 
