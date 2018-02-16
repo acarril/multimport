@@ -38,30 +38,24 @@ if `c(changed)' == 1 & ("`clear'" != "clear" & `clearpos' == 0) {
 * Parse program options
 *-------------------------------------------------------------------------------
 
-// Import all files from directory() if specified
-if "`directory'" != ""{
-	// Check if directory=="." (current directory), then empty local
-	if "`directory'" == "." local directory 
+// Add final forward slash to directory if not empty and it doesn't have it
+local lastdirchar = substr("`directory'", -1, .)
+if "`lastdirchar'" != "/" & "`directory'" != "" local directory `directory'/
 
-	// Add final forward slash to directory if not empty and it doesn't have it
-	local lastdirchar = substr("`directory'", -1, .)
-	if "`lastdirchar'" != "/" & "`directory'" != "" local directory `directory'/
-
-	// Add default extensions according to import_method, if they weren't specified
-	if "`extensions'" == "" {
-		if "`importmethod'" == 	   "excel" 	local extensions xls xlsx
-		if "`importmethod'" == "delimited" 	local extensions csv
-	}
-
-	// Parse files to import, collecting all files with `extensions' of `directory'
-	foreach ext of local extensions {
-		local add : dir "`directory'" files "*.`ext'", respectcase
-		local files `files' `"`add'"'
-	}
+// Add default extensions according to import_method, if they weren't specified
+if "`extensions'" == "" {
+	if "`importmethod'" == 	   "excel" 	local extensions xls xlsx
+	if "`importmethod'" == "delimited" 	local extensions csv
 }
 
-// Include any specific (possibly additional) files
-local files : list files | include
+// Parse files to import, collecting all files with `extensions' of `directory'
+foreach ext of local extensions {
+	local add : dir "`directory'" files "*.`ext'", respectcase
+	local files `files' `"`add'"'
+}
+
+// Of all files in directory(), use only those in include()
+local files : list files & include
 
 // Exclude any specific files
 local files : list files - exclude
@@ -114,5 +108,7 @@ foreach f of local files {
 // Define and apply value label to _filename
 label define _filename `valuelabs'
 label values _filename _filename
+
+return local files = `files'
 
 end
