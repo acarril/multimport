@@ -56,6 +56,9 @@ local files : list files | include
 // Exclude any specific files
 local files : list files - exclude
 
+// Check if directory=="." (current directory), then empty local
+if "`directory'" == "." local directory 
+
 // Add final forward slash to directory if not empty and it doesn't have it
 local lastdirchar = substr("`directory'", -1, .)
 if "`lastdirchar'" != "/" & "`directory'" != "" local directory `directory'/
