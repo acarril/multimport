@@ -6,8 +6,8 @@ syntax anything(name=importmethod id="import method") [using], ///
 		DIRectory(string) ///
 		IMPORToptions(string asis) ///
 		APPENDoptions(string asis) ///
-		exclude(string asis) ///
-		include(string asis) ///
+		EXclude(string asis) ///
+		INclude(string asis) ///
 		force clear ///
 	]
 
