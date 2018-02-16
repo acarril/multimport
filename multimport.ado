@@ -67,12 +67,14 @@ if `Nfiles' == 0 {
 	exit 198
 }
 
-// List files to import and confirm
+// List files to import
+di as text "Files to import:"
+foreach f of local files {
+	di "`f'"
+}
+
+// Confirm import if force is not specified
 if "`force'" != "force" {
-	di as text "Files to import:"
-	foreach f of local files {
-		di "`f'"
-	}
 	di as result "Proceed? (yes/no)" _request(_yesno) // it doesn't produce a local without underscore
 	if "`yesno'" != "yes" exit 1
 }
