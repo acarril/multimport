@@ -55,7 +55,7 @@ foreach ext of local extensions {
 }
 
 // Of all files in directory(), use only those in include()
-local files : list files & include
+if "`include'" != "" local files : list files & include
 
 // Exclude any specific files
 local files : list files - exclude
