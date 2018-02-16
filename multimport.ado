@@ -1,6 +1,6 @@
 *! 1.0 Alvaro Carril 14feb2018
 program define multimport, rclass
-syntax anything(name=importmethod id="import method") [using], ///
+syntax anything(name=importmethod id="import_method") [using], ///
 	[ ///
 		EXTensions(string) ///
 		DIRectory(string) ///
@@ -37,6 +37,12 @@ if `c(changed)' == 1 & ("`clear'" != "clear" & `clearpos' == 0) {
 *-------------------------------------------------------------------------------
 * Parse program options
 *-------------------------------------------------------------------------------
+
+// Add default extensions according to import_method, if they weren't specified
+if "`extensions'" == "" {
+	if "`importmethod'" == 	   "excel" 	local extensions xls xlsx
+	if "`importmethod'" == "delimited" 	local extensions csv
+}
 
 // Parse files to import, collecting all files with `extensions' of `directory'
 foreach ext of local extensions {
