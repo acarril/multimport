@@ -49,7 +49,7 @@
 {p2coldent:* {opth inc:lude(filename:file1 [file2 ...])}}specific filenames to import{p_end}
 {synopt : {opth exc:lude(filename:file1 [file2 ...])}}specific filenames to exclude from import{p_end}
 {synopt : {opth import:options(import:import_method_opts)}}pass options to {helpb import:[D] import {it:import_method}}{p_end}
-{synopt : {opth append:options(append:append_method_opts)}}pass options to {helpb append:[D] append}{p_end}
+{synopt : {opth append:options(append:append_opts)}}pass options to {helpb append:[D] append}{p_end}
 {synopt :{opt force}}skip user confirmation prompt{p_end}
 {synopt :{opt clear}}replace data in memory{p_end}
 {synoptline}
@@ -99,10 +99,25 @@ These default extensions can be modified with the {opth ext:ension(multimport##e
 {p2col 8 12 12 2:}{cmd:. multimport delimited, extensions(csv txt)}{p_end}
 
 {phang}
-{opth res:iduals(newvar)} will save the regression residuals in a new variable.
+{opth inc:lude(filename:file1 [file2 ...])} allows to indicate specific files to be imported, instead of importing all files in {opth dir:ectory(dir:filespec)}. For example,{p_end}
 
-{pmore}
-This is a superior alternative than running {cmd:predict, resid} afterwards as it's faster and doesn't require saving the fixed effects.
+{p2col 8 12 12 2:}{cmd:. multimport excel, include("svy2011.xls" "svy2012.xls" "svy2013.xls")}{p_end}
+
+{phang}
+{opth exc:lude(filename:file1 [file2 ...])} allows to indicate specific files to be excluded from the automatic import.{p_end}
+
+{phang}
+{opth import:options(import:import_method_opts)} allows to pass options to {helpb import:import {it:import_method}}. For example, it can be used to specify a specific separation character for delimited files:
+{p_end}
+
+{p2col 8 12 12 2:}{cmd:. multimport excel, importoptions(delimiter(";"))}{p_end}
+
+{phang}
+{opth append:options(append:append_opts)} allows to pass options to {helpb append:append}.
+For example, it can be used to keep specified variables from appending dataset(s):
+{p_end}
+
+{p2col 8 12 12 2:}{cmd:. multimport excel, appendptions(keep(id strata sex race age))}{p_end}
 
 
 {marker examples}{...}
