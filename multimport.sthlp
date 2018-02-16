@@ -46,8 +46,8 @@
 {synoptline}
 {p2coldent:* {opth dir:ectory(dir:filespec)}}directory of files to import; if not specified, it defaults to the current working directory{p_end}
 {synopt : {opth ext:ension(multimport##extension:ext1 [ext2 ...])}}override file extension(s) scanned in {opt directory(filespec)}; if not specified, sensible defaults are inferred from {it:import_method}{p_end}
-{p2coldent:* {opth in:clude(filename:file1 [file2 ...])}}specific filenames to import{p_end}
-{synopt : {opth ex:clude(filename:file1 [file2 ...])}}specific filenames to exclude from import{p_end}
+{p2coldent:* {opth inc:lude(filename:file1 [file2 ...])}}specific filenames to import{p_end}
+{synopt : {opth exc:lude(filename:file1 [file2 ...])}}specific filenames to exclude from import{p_end}
 {synopt : {opth import:options(import:import_method_opts)}}pass options to {helpb import:[D] import {it:import_method}}{p_end}
 {synopt : {opth append:options(append:append_method_opts)}}pass options to {helpb append:[D] append}{p_end}
 {synopt :{opt force}}skip user confirmation prompt{p_end}
@@ -626,67 +626,12 @@ on the other hand, there may be alternatives:
 {title:Stored results}
 
 {pstd}
-{cmd:multimport} stores the following in {cmd:e()}:
-
-{pstd}
-{it:Note: it also keeps most e() results placed by the regression subcommands (ivreg2, ivregress)}
-
-{synoptset 24 tabbed}{...}
-{syntab:Scalars}
-{synopt:{cmd:e(N)}}number of observations{p_end}
-{synopt:{cmd:e(N_hdfe)}}number of absorbed fixed-effects{p_end}
-{synopt:{cmd:e(tss)}}total sum of squares{p_end}
-{synopt:{cmd:e(rss)}}residual sum of squares{p_end}
-{synopt:{cmd:e(r2)}}R-squared{p_end}
-{synopt:{cmd:e(r2_a)}}adjusted R-squared{p_end}
-{synopt:{cmd:e(r2_within)}}Within R-squared{p_end}
-{synopt:{cmd:e(r2_a_within)}}Adjusted Within R-squared{p_end}
-{synopt:{cmd:e(df_a)}}degrees of freedom lost due to the fixed effects{p_end}
-{synopt:{cmd:e(rmse)}}root mean squared error{p_end}
-{synopt:{cmd:e(ll)}}log-likelihood{p_end}
-{synopt:{cmd:e(ll_0)}}log-likelihood of fixed-effect-only regression{p_end}
-{synopt:{cmd:e(F)}}F statistic{p_end}
-{synopt:{cmd:e(F_absorb)}}F statistic for absorbed effect {it:note: currently disabled}{p_end}
-{synopt:{cmd:e(rank)}}rank of {cmd:e(V)}{p_end}
-{synopt:{cmd:e(N_clustervars)}}number of cluster variables{p_end}
-        
-{synopt:{cmd:e(clust}#{cmd:)}}number of clusters for the #th cluster variable{p_end}
-{synopt:{cmd:e(N_clust)}}number of clusters; minimum of {it:e(clust#)}{p_end}
-
-{synopt:{cmd:e(K}#{cmd:)}}Number of categories of the #th absorbed FE{p_end}
-{synopt:{cmd:e(M}#{cmd:)}}Number of redundant categories of the #th absorbed FE{p_end}
-{synopt:{cmd:e(mobility)}}Sum of all {cmd:e(M#)}{p_end}
-{synopt:{cmd:e(df_m)}}model degrees of freedom{p_end}
-{synopt:{cmd:e(df_r)}}residual degrees of freedom{p_end}
+{cmd:multimport} stores the following in {cmd:r()}:
 
 {synoptset 24 tabbed}{...}
 {syntab:Macros}
-{synopt:{cmd:e(cmd)}}{cmd:multimport}{p_end}
-{synopt:{cmd:e(subcmd)}}either {cmd:regress}, {cmd:ivreg2} or {cmd:ivregress}{p_end}
-{synopt:{cmd:e(model)}}{cmd:ols}, {cmd:iv}, {cmd:gmm2s}, {cmd:liml} or {cmd:cue}{p_end}
-{synopt:{cmd:e(cmdline)}}command as typed{p_end}
-{synopt:{cmd:e(dofmethod)}}dofmethod employed in the regression{p_end}
-{synopt:{cmd:e(depvar)}}name of dependent variable{p_end}
-{synopt:{cmd:e(indepvars)}}names of independent variables{p_end}
-{synopt:{cmd:e(endogvars)}}names of endogenous right-hand-side variables{p_end}
-{synopt:{cmd:e(instruments)}}names of excluded instruments{p_end}
-{synopt:{cmd:e(absvars)}}name of the absorbed variables or interactions{p_end}
-{synopt:{cmd:e(title)}}title in estimation output{p_end}
-{synopt:{cmd:e(clustvar)}}name of cluster variable{p_end}
-{synopt:{cmd:e(clustvar}#{cmd:)}}name of the #th cluster variable{p_end}
-{synopt:{cmd:e(vce)}}{it:vcetype} specified in {cmd:vce()}{p_end}
-{synopt:{cmd:e(vcetype)}}title used to label Std. Err.{p_end}
-{synopt:{cmd:e(stage)}}stage within an IV-regression; only if {it:stages()} was used{p_end}
-{synopt:{cmd:e(properties)}}{cmd:b V}{p_end}
-
-{synoptset 24 tabbed}{...}
-{syntab:Matrices}
-{synopt:{cmd:e(b)}}coefficient vector{p_end}
-{synopt:{cmd:e(V)}}variance-covariance matrix of the estimators{p_end}
-
-{synoptset 24 tabbed}{...}
-{syntab:Functions}
-{synopt:{cmd:e(sample)}}marks estimation sample{p_end}
+{synopt:{cmd:r(directory)}}directory as typed{p_end}
+{synopt:{cmd:r(files)}}list of imported filenames{p_end}
 {p2colreset}{...}
 
 

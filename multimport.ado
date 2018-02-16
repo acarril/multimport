@@ -6,8 +6,8 @@ syntax anything(name=importmethod id="import_method") [using], ///
 		DIRectory(string) ///
 		IMPORToptions(string asis) ///
 		APPENDoptions(string asis) ///
-		EXclude(string asis) ///
-		INclude(string asis) ///
+		EXClude(string asis) ///
+		INClude(string asis) ///
 		force clear ///
 	]
 
@@ -109,6 +109,7 @@ foreach f of local files {
 label define _filename `valuelabs'
 label values _filename _filename
 
-return local files = `files'
+return local files `files'
+return local directory `directory'
 
 end
