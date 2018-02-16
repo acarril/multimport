@@ -45,7 +45,7 @@
 {synopthdr}
 {synoptline}
 {p2coldent:* {opth dir:ectory(dir:filespec)}}directory of files to import; if not specified, it defaults to the current working directory{p_end}
-{synopt : {opth ext:ension(multimport##extension:ext1 [ext2 ...])}}override file extension(s) scanned in {opt directory(filespec)}; if not specified, sensible defaults are inferred from {it:import_method}{p_end}
+{synopt : {opth ext:ensions(multimport##extension:ext1 [ext2 ...])}}override file extension(s) scanned in {opt directory(filespec)}; if not specified, sensible defaults are inferred from {it:import_method}{p_end}
 {p2coldent:* {opth inc:lude(filename:file1 [file2 ...])}}specific filenames to import{p_end}
 {synopt : {opth exc:lude(filename:file1 [file2 ...])}}specific filenames to exclude from import{p_end}
 {synopt : {opth import:options(import:import_method_opts)}}pass options to {helpb import:[D] import {it:import_method}}{p_end}
@@ -63,7 +63,11 @@
 {pstd}
 {cmd:multimport} is a simple tool for importing multiple non-Stata data into memory, appending them automatically.
 According to the specified {it:import_method}, it works similarly to {help import_delimited:import delimited} or {help import_excel:import excel}.
-However, it automatically scans the directory specified in {opt directory(filespec)}, looking for all files with extensions that are inferred from {it:import_method} (e.g. *.xls and *.xlsx files for {cmd:multimport excel}).
+However, it automatically scans the directory specified in {opt directory(filespec)}, looking for all files with extensions that are inferred from {it:import_method}:{p_end}
+{p2col 8 12 12 2: -}{cmd:multimport excel} looks for *.xls and *.xlsx files.{p_end}
+{p2col 8 12 12 2: -}{cmd:multimport delimited} looks for *.csv files.{p_end}
+{pstd}
+These defaults may be overridden with the {opt extensions(ext1 [ext2 ...])} option.
 
 {pstd}
 {cmd:multimport} will list all files that will be imported and ask the user for confirmation before continuing, unless the {opt force} option is specified to override this prompt.
@@ -71,29 +75,28 @@ The program will import and append all listed files, generating a new variable {
 Additional optiones may be passed to {helpb import:[D] import {it:import_method}} and {helpb append:[D] append} using {opt importoptions(import_method_opts)} and {opt appendoptions(append_opts)}, respectively.
 
 {pstd}
-Additional files may be specifically included with the {opt include(file1 [file2 ...])} option, and specific files may be excluded via the {opt exclude(file1 [file2 ...])} option.
-
+Specific files in {opt directory(filespec)} may be excluded from the import with the {opt exclude(file1 [file2 ...])} option.
+Alternatively, a specific list of files to be imported may be indicated with the {opt include(file1 [file2 ...])} option.
 
 
 {marker options}{...}
 {title:Options}
 
-{marker opt_model}{...}
-{dlgtab:Model and Miscellanea}
+{phang}
+{opth dir:ectory(dir:filespec)} directory where files to be imported are located. If not specified, it will default to the current working directory.
 
 {phang}
-{opth a:bsorb(multimport##absvar:absvars)} list of categorical variables (or interactions) representing the fixed effects to be absorbed.
-this is equivalent to including an indicator/dummy variable for each category of each {it:absvar}. {cmd:absorb()} is required.
+{opth ext:ensions(multimport##extension:ext1 [ext2 ...])} overrides the default file extensions of files that {cmd:multimport} will import.
+By default, {cmd:multimport} scans the directory specified in {opt directory(filespec)}, looking for all files with extensions that are inferred from {it:import_method}:{p_end}
+
+{p2col 8 12 12 2:}{cmd:multimport excel} looks for *.xls and *.xlsx files.{p_end}
+{p2col 8 12 12 2:}{cmd:multimport delimited} looks for *.csv files.{p_end}
+{pstd}
 
 {pmore}
-To save a fixed effect, prefix the absvar with "{newvar}{cmd:=}".
-For instance, the option {cmd:absorb(firm_id worker_id year_coefs=year_id)} will include firm,
-worker and year fixed effects, but will only save the estimates for the year fixed effects (in the new variable {it:year_coefs}).
+These default extensions can be modified with the {opth ext:ension(multimport##extension:ext1 [ext2 ...])} option. For example, in order to import delimited files that are stored both as *.csv or *.txt files with{p_end}
 
-{pmore}
-If you want to {help multimport##postestimation:predict} afterwards but don't care about setting the names of each fixed effect, use the {cmdab:save:fe} suboption.
-This will delete all variables named {it:__hdfe*__} and create new ones as required.
-Example: {it:multimport price weight, absorb(turn trunk, savefe)}
+{p2col 8 12 12 2:}{cmd:. multimport delimited, extensions(csv txt)}{p_end}
 
 {phang}
 {opth res:iduals(newvar)} will save the regression residuals in a new variable.
@@ -101,467 +104,6 @@ Example: {it:multimport price weight, absorb(turn trunk, savefe)}
 {pmore}
 This is a superior alternative than running {cmd:predict, resid} afterwards as it's faster and doesn't require saving the fixed effects.
 
-{phang}
-{opth su:mmarize(tabstat##statname:stats)} will report and save a table of summary of statistics of the regression
-variables (including the instruments, if applicable), using the same sample as the regression.
-
-{pmore} {opt su:mmarize} (without parenthesis) saves the default set of statistics: {it:mean min max}.
-
-{pmore} The complete list of accepted statistics is available in the {help tabstat##statname:tabstat help}. The most useful are {it:count range sd median p##}.
-
-{pmore} The summary table is saved in {it:e(summarize)}
-
-{pmore} To save the summary table silently (without showing it after the regression table), use the {opt qui:etly} suboption. You can use it by itself ({cmd:summarize(,quietly)}) or with custom statistics ({cmd:summarize(mean, quietly)}).
-
-{phang}
-{opt subopt:ions(...)}
-options that will be passed directly to the regression command (either {help regress}, {help ivreg2}, or {help ivregress})
-
-{marker opt_vce}{...}
-{dlgtab:SE/Robust}
-
-{phang}
-{opth vce:(multimport##vcetype:vcetype, subopt)}
-specifies the type of standard error reported.
-Note that all the advanced estimators rely on asymptotic theory, and will likely have poor performance with small samples
-(but again if you are using multimport, that is probably not your case)
-
-{pmore}
-{opt un:adjusted}/{opt ols:} estimates conventional standard errors, valid even in small samples
-under the assumptions of homoscedasticity and no correlation between observations
-
-{pmore}
-{opt r:obust} estimates heteroscedasticity-consistent standard errors (Huber/White/sandwich estimators), but still assuming independence between observations
-
-{pmore}Warning: in a FE panel regression, using {opt r:obust} will
-lead to inconsistent standard errors if for every fixed effect, the {it:other} dimension is fixed.
-For instance, in an standard panel with individual and time fixed effects, we require both the number of
-individuals and time periods to grow asymptotically.
-If that is not the case, an alternative may be to use clustered errors,
-which as discussed below will still have their own asymptotic requirements.
-For a discussion, see
-{browse "http://www.princeton.edu/~mwatson/papers/ecta6489.pdf":Stock and Watson, "Heteroskedasticity-robust standard errors for fixed-effects panel-data regression," Econometrica 76 (2008): 155-174}
-
-{pmore}
-{opt cl:uster} {it:clustervars} estimates consistent standard errors even when the observations
-are correlated within groups.
-
-{pmore}
-Multi-way-clustering is allowed. Thus, you can indicate as many {it:clustervar}s as desired
-(e.g. allowing for intragroup correlation across individuals, time, country, etc).
-
-{pmore}
-Each {it:clustervar} permits interactions of the type {it:var1{cmd:#}var2}
-(this is faster than using {cmd:egen group()} for a one-off regression).
-
-{pmore} Warning: The number of clusters, for all of the cluster variables, must go off to infinity.
-A frequent rule of thumb is that each cluster variable must have at least 50 different categories
-(the number of categories for each clustervar appears on the header of the regression table).
-
-{pstd}
-The following suboptions require either the {help ivreg2} or the {help avar} package from SSC.
-For a careful explanation, see the {help ivreg2##s_robust:ivreg2 help file}, from which the comments below borrow.
-
-{pmore}
-{opt u:nadjusted}{cmd:, }{opt bw(#)} (or just {cmd:, }{opt bw(#)}) estimates autocorrelation-consistent standard errors (Newey-West).
-
-{pmore}
-{opt r:obust}{cmd:, }{opt bw(#)} estimates autocorrelation-and-heteroscedasticity consistent standard errors (HAC).
-
-{pmore}
-{opt cl:uster} {it:clustervars}{cmd:, }{opt bw(#)} estimates standard errors consistent to common autocorrelated disturbances (Driscoll-Kraay). At most two cluster variables can be used in this case.
-
-{pmore}
-{cmd:, }{opt kiefer} estimates standard errors consistent under arbitrary intra-group autocorrelation (but not heteroskedasticity) (Kiefer).
-
-{pmore}
-{opt kernel(str)} is allowed in all the cases that allow {opt bw(#)}
-The default kernel is {it:bar} (Bartlett). Valid kernels are Bartlett (bar); Truncated (tru); Parzen (par);
-Tukey-Hanning (thann); Tukey-Hamming (thamm); Daniell (dan); Tent (ten); and Quadratic-Spectral (qua or qs). 
-
-{pstd}
-Advanced suboptions:
-
-{pmore}
-{cmd:, }{opt suite(default|mwc|avar)} overrides the package chosen by multimport to estimate the VCE.
-{it:default} uses the default Stata computation (allows unadjusted, robust, and at most one cluster variable).
-{it:mwc} allows multi-way-clustering (any number of cluster variables), but without the {it:bw} and {it:kernel} suboptions.
-{it:avar} uses the avar package from SSC. Is the same package used by ivreg2, and allows the {it:bw}, {it:kernel}, {it:dkraay} and {it:kiefer} suboptions.
-This is useful almost exclusively for debugging.
-
-{pmore}
-{cmd:, }{opt twice:robust} will compute robust standard errors not only on the first but on the second step of the gmm2s estimation. Requires {opt ivsuite(ivregress)}, but will not give the exact same results as ivregress.
-
-{pmore}{it:Explanation:} When running instrumental-variable regressions with the {cmd:ivregress} package,
-robust standard errors, and a gmm2s estimator, multimport will translate
-{opt vce(robust)} into {opt wmatrix(robust)} {opt vce(unadjusted)}.
-This maintains compatibility with {cmd:ivreg2} and other packages, but may unadvisable as described in {help ivregress} (technical note). Specifying this option will instead use {opt wmatrix(robust)} {opt vce(robust)}.
-
-{pmore}However, computing the second-step vce matrix requires computing updated estimates (including updated fixed effects).
-Since multimport currently does not allow this, the resulting standard errors
-{hi:will not be exactly the same as with ivregress}.
-This issue is similar to applying the CUE estimator, described further below.
-
-{pmore}Note: The above comments are also appliable to clustered standard error.
-
-{marker opt_iv}{...}
-{dlgtab:IV/2SLS/GMM}
-
-{phang}
-{opt est:imator}{cmd:(}{opt 2sls}|{opt gmm:2s}|{opt liml}|{opt cue}{cmd:)}
-estimator used in the instrumental-variable estimation
-
-{pmore}
-{opt 2sls} (two-stage least squares, default), {opt gmm:2s} (two-stage efficient GMM), {opt liml} (limited-information maximum likelihood), and
-{opt cue} ("continuously-updated" GMM) are allowed.{p_end}
-
-{pmore}
-Warning: {opt cue} will not give the same results as ivreg2. See the discussion in
-{browse "http://www.stata-journal.com/sjpdf.html?articlenum=st0030_3": Baum, Christopher F., Mark E. Schaffer, and Steven Stillman. "Enhanced routines for instrumental variables/GMM estimation and testing." Stata Journal 7.4 (2007): 465-506}
-(page 484).
-Note that even if this is not exactly {opt cue}, it may still be a desirable/useful alternative to standard cue, as explained in the article.
-
-{phang}
-{opt stage:s(list)}
-adds and saves up to four auxiliary regressions useful when running instrumental-variable regressions:
-
-{phang2}{cmd:first} all first-stage regressions{p_end}
-{phang2}{cmd:ols} ols regression (between dependent variable and endogenous variables; useful as a benchmark){p_end}
-{phang2}{cmd:reduced} reduced-form regression (ols regression with included and excluded instruments as regressors){p_end}
-{phang2}{cmd:acid} an "acid" regression that includes both instruments and endogenous variables as regressors; in this setup, excluded instruments should not be significant.{p_end}
-
-{pmore}
-You can pass suboptions not just to the iv command but to all stage regressions with a comma after the list of stages. Example:{break}
-{cmd:multimport price (weight=length), absorb(turn) subopt(nocollin) stages(first, eform(exp(beta)) )}
-
-{pmore}
-By default all stages are saved (see {help estimates dir}).
-The suboption {cmd:,nosave} will prevent that.
-However, future {cmd:replay}s will only replay the iv regression.
-
-{phang}
-{opt ffirst}
-compute and report first stage statistics ({help ivreg2##s_relevance:details}); requires the ivreg2 package.
-
-{pmore}
-These statistics will be saved on the {it:e(first)} matrix. 
-If the first-stage estimates are also saved (with the {cmd:stages()} option), the respective statistics will be copied to {cmd:e(first_*)}.
-
-{phang}
-{opth iv:suite(subcmd)}
-allows the IV/2SLS regression to be run either using {opt ivregress} or {opt ivreg2}.
-
-{pmore} {opt ivreg2} is the default, but needs to be installed for that option to work.
-
-{marker opt_diagnostic}{...}
-{dlgtab:Diagnostic}
-
-{phang}
-{opt v:erbose(#)} orders the command to print debugging information.
-
-{pmore}
-Possible values are 0 (none), 1 (some information), 2 (even more), 3 (adds dots for each iteration, and reportes parsing details), 4 (adds details for every iteration step)
-
-{pmore}
-For debugging, the most useful value is 3. For simple status reports, set verbose to 1.
-
-{phang}
-{opt time:it} shows the elapsed time at different steps of the estimation. Most time is usually spent on three steps: map_precompute(), map_solve() and the regression step.
- 
-{marker opt_dof}{...}
-{dlgtab:Degrees-of-Freedom Adjustments}
-
-{phang}
-{opt dof:adjustments(doflist)} selects how the degrees-of-freedom, as well as e(df_a), are adjusted due to the absorbed fixed effects.
-
-{pmore}
-Without any adjustment, we would assume that the degrees-of-freedom used by the fixed effects is equal to the count of all the fixed effects
-(e.g. number of individuals + number of years in a typical panel).
-However, in complex setups (e.g. fixed effects by individual, firm, job position, and year),
-there may be a huge number of fixed effects collinear with each other, so we want to adjust for that.
-
-{pmore}
-Note: changing the default option is rarely needed, except in benchmarks, and to obtain a marginal speed-up by excluding the {opt pair:wise} option.
-
-{pmore}
-{opt all} is the default and almost always the best alternative. It is equivalent to {opt dof(pairwise clusters continuous)}
-
-{pmore}
-{opt none} assumes no collinearity across the fixed effects (i.e. no redundant fixed effects). This is overtly conservative, although it is the faster method by virtue of not doing anything.
-
-{pmore}
-{opt first:pair} will exactly identify the number of collinear fixed effects across the first two sets of fixed effects
-(i.e. the first absvar and the second absvar).
-The algorithm used for this is described in Abowd et al (1999), and relies on results from graph theory
-(finding the number of connected sub-graphs in a bipartite graph).
-It will not do anything for the third and subsequent sets of fixed effects.
-
-{pmore}
-For more than two sets of fixed effects, there are no known results that provide exact degrees-of-freedom as in the case above.
-One solution is to ignore subsequent fixed effects (and thus oversestimate e(df_a) and understimate the degrees-of-freedom).
-Another solution, described below, applies the algorithm between pairs of fixed effects to obtain a better (but not exact) estimate:
-
-{pmore}
-{opt pair:wise} applies the aforementioned connected-subgraphs algorithm between pairs of fixed effects.
-For instance, if there are four sets of FEs, the first dimension will usually have no redundant coefficients (i.e. e(M1)==1), since we are running the model without a constant.
-For the second FE, the number of connected subgraphs with respect to the first FE will provide an exact estimate of the degrees-of-freedom lost, e(M2).
-
-{pmore}
-For the third FE, we do not know exactly.
-However, we can compute the number of connected subgraphs between the first and third {it:G(1,3)},
-and second and third {it:G(2,3)} fixed effects, and choose the higher of those as the closest estimate for e(M3).
-For the fourth FE, we compute {it:G(1,4)}, {it:G(2,4)} and {it:G(3,4)} and again choose the highest for e(M4).
-
-{pmore}
-Finally, we compute e(df_a) = e(K1) - e(M1) + e(K2) - e(M2) + e(K3) - e(M3) + e(K4) - e(M4);
-where e(K#) is the number of levels or dimensions for the #-th fixed effect (e.g. number of individuals or years).
-Note that e(M3) and e(M4) are only conservative estimates and thus we will usually be overestimating the standard errors. However, given the sizes of the datasets typically used with multimport, the difference should be small. 
-
-{pmore}
-Since the gain from {opt pair:wise} is usually {it:minuscule} for large datasets, and the computation is expensive, it may be a good practice to exclude this option for speedups.
-
-{pmore}
-{opt cl:usters}
-will check if a fixed effect is nested within a {it:clustervar}.
-In that case, it will set e(K#)==e(M#) and no degrees-of-freedom will be lost due to this fixed effect.
-The rationale is that we are already assuming that the number of effective observations is the number of cluster levels.
-This is the same adjustment that {cmd:xtreg, fe} does, but {cmd:areg} does not use it.
-
-{pmore}
-{opt cont:inuous}
-Fixed effects with continuous interactions (i.e. individual slopes, instead of individual intercepts) are dealt with differently.
-In an i.categorical#c.continuous interaction, we will do one check: we count the number of categories where c.continuous is always zero.
-In an i.categorical##c.continuous interaction, we do the above check but replace zero for any particular constant.
-In the case where continuous is constant for a level of categorical, we know it is collinear with the intercept, so we adjust for it.
-
-{pmore}
-Additional methods, such as {opt bootstrap} are also possible but not yet implemented.
-Some preliminary simulations done by the author showed a very poor convergence of this method.
-
-{phang}
-{opth groupv:ar(newvar)} name of the new variable that will contain the first mobility group.
-Requires {opt pair:wise}, {opt first:pair}, or the default {opt all}.
-
-{marker opt_speedup}{...}
-{dlgtab:Speeding Up Estimation}
-
-{phang}
-{cmd:multimport} {varlist} {ifin}{cmd:,} {opt a:bsorb(absvars)} {cmd:save(cache)} [{it:options}]
-
-{pmore}
-This will transform {it:varlist}, absorbing the fixed effects indicated by {it:absvars}.
-It is useful when running a series of alternative specifications with common variables, as the variables will only be transformed once instead of every time a regression is run.
-
-{pmore}
-It replaces the current dataset, so it is a good idea to precede it with a {help preserve} command
-
-{pmore}
-To keep additional (untransformed) variables in the new dataset, use the {opth keep(varlist)} suboption.
-
-{phang}
-{cmd:cache(use)} is used when running multimport after a {it:save(cache)} operation. Both the {it:absorb()} and {it:vce()} options must be the same as when the cache was created (the latter because the degrees of freedom were computed at that point).
-
-{phang}
-{cmd:cache(clear)} will delete the Mata objects created by {it:multimport} and kept in memory after the {it:save(cache)} operation. These objects may consume a lot of memory, so it is a good idea to clean up the cache. Additionally, if you previously specified {it:preserve}, it may be a good time to {it:restore}.
-
-{pmore}Example:{p_end}
-{phang2}{cmd:. sysuse auto}{p_end}
-{phang2}{cmd:. preserve}{p_end}
-{phang2}{cmd:.}{p_end}
-{phang2}{cmd:. * Save the cache}{p_end}
-{phang2}{cmd:. multimport price weight length, a(turn rep) vce(turn) cache(save, keep(foreign))}{p_end}
-{phang2}{cmd:.}{p_end}
-{phang2}{cmd:. * Run regressions}{p_end}
-{phang2}{cmd:. multimport price weight, a(turn rep) cache(use)}{p_end}
-{phang2}{cmd:. multimport price length, a(turn rep) cache(use)}{p_end}
-{phang2}{cmd:.}{p_end}
-{phang2}{cmd:. * Clean up}{p_end}
-{phang2}{cmd:. multimport, cache(clear)}{p_end}
-{phang2}{cmd:. restore}{p_end}
-
-{phang}
-{opt fast} avoids saving {it:e(sample)} into the regression.
-Since saving the variable only involves copying a Mata vector, the speedup is currently quite small.
-Future versions of multimport may change this as features are added.
-
-{pmore}
-Note that {opt fast} will be disabled when adding variables to the dataset (i.e. when saving residuals, fixed effects, or mobility groups), and is incompatible with most postestimation commands.
-
-{pmore}
-If you wish to use {opt fast} while reporting {cmd:estat summarize}, see the {opt summarize} option.
-
-{marker opt_optimization}{...}
-{dlgtab:Optimization}
-
-{phang}
-{opth tol:erance(#)} specifies the tolerance criterion for convergence; default is {cmd:tolerance(1e-8)}
-
-{pmore}
-Note that for tolerances beyond 1e-14, the limits of the {it:double} precision are reached and the results will most likely not converge.
-
-{pmore}
-At the other end, is not tight enough, the regression may not identify perfectly collinear regressors. However, those cases can be easily spotted due to their extremely high standard errors.
-
-{pmore}
-Warning: when absorbing heterogeneous slopes without the accompanying heterogeneous intercepts, convergence is quite poor and a tight tolerance is strongly suggested (i.e. higher than the default). In other words, an absvar of {it:var1##c.var2} converges easily, but an absvar of {it:var1#c.var2} will converge slowly and may require a tighter tolerance.
-
-{phang}
-{opth maxit:erations(#)}
-specifies the maximum number of iterations; the default is {cmd:maxiterations(10000)}; set it to missing ({cmd:.}) to run forever until convergence.
-
-{phang}
-{opth pool:size(#)}
-Number of variables that are {it:pooled together} into a matrix that will then be transformed.
-The default is to pool variables in groups of 5. Larger groups are faster with more than one processor, but may cause out-of-memory errors. In that case, set poolsize to 1.
-
-{phang}
-{it:Advanced options:}
-
-{phang}
-{opt acceleration(str)} allows for different acceleration techniques, from the simplest case of 
-no acceleration ({opt no:ne}), to steep descent ({opt st:eep_descent} or {opt sd}), Aitken ({opt a:itken}),
-and finally Conjugate Gradient ({opt co:njugate_gradient} or {opt cg}).
-
-{pmore}
-Note: Each acceleration is just a plug-in Mata function, so a larger number of acceleration techniques are available, albeit undocumented (and slower).
-
-{phang}
-{opt transf:orm(str)} allows for different "alternating projection" transforms. The classical transform is Kaczmarz ({opt kac:zmarz}), and more stable alternatives are Cimmino ({opt cim:mino}) and Symmetric Kaczmarz ({opt sym:metric_kaczmarz})
-
-{pmore}
-Note: Each transform is just a plug-in Mata function, so a larger number of acceleration techniques are available, albeit undocumented (and slower).
-
-{pmore}
-Note: The default acceleration is Conjugate Gradient and the default transform is Symmetric Kaczmarz. Be wary that different accelerations often work better with certain transforms. For instance, do not use conjugate gradient with plain Kaczmarz, as it will not converge.
-
-{phang}
-{opt precondition} {it:(currently disabled)}
-
-{marker opt_reporting}{...}
-{dlgtab:Reporting}
-
-{phang}
-{opt l:evel(#)} sets confidence level; default is {cmd:level(95)}
-
-{marker display_options}{...}
-{phang}
-{it:display_options}:
-{opt noomit:ted},
-{opt vsquish},
-{opt noempty:cells},
-{opt base:levels},
-{opt allbase:levels},
-{opt nofvlabel},
-{opt fvwrap(#)},
-{opt fvwrapon(style)},
-{opth cformat(%fmt)},
-{opt pformat(%fmt)},
-{opt sformat(%fmt)}, and
-{opt nolstretch};
-    see {helpb estimation options##display_options:[R] estimation options}.
-    {p_end}
-
-
-{marker postestimation}{...}
-{title:Postestimation Syntax}
-
-Only {cmd:estat summarize}, {cmd:predict} and {cmd:test} are currently supported and tested.
-
-{p 8 13 2}
-{cmd:estat summarize}
-{p_end}{col 23}Summarizes {it:depvar} and the variables described in {it:_b} (i.e. not the excluded instruments)
-
-{p 8 16 2}
-{cmd:predict} 
-{newvar} 
-{ifin}
-[{cmd:,} {it:statistic}]
-{p_end}{col 23}May require you to previously save the fixed effects (except for option {opt xb}).
-{col 23}To see how, see the details of the {help multimport##absvar:absorb} option
-{col 23}Equation: y = xb + d_absorbvars + e
-
-{synoptset 20 tabbed}{...}
-{synopthdr:statistic}
-{synoptline}
-{syntab :Main}
-{p2coldent: {opt xb}}xb fitted values; the default{p_end}
-{p2coldent: {opt xbd}}xb + d_absorbvars{p_end}
-{p2coldent: {opt d}}d_absorbvars{p_end}
-{p2coldent: {opt r:esiduals}}residual{p_end}
-{p2coldent: {opt sc:ore}}score; equivalent to {opt residuals}{p_end}
-{p2coldent: {opt stdp}}standard error of the prediction (of the xb component){p_end}
-{synoptline}
-{p2colreset}{...}
-{p 4 6 2}although {cmd:predict} {help data_types:type} {help newvar} is allowed,
-the resulting variable will always be of type {it:double}.{p_end}
-
-
-{col 8}{cmd:test}{col 23}Performs significance test on the parameters, see the {help test:stata help}
-
-{col 8}{cmd:suest}{col 23}Do not use {cmd:suest}. It will run, but the results will be incorrect. See workaround below
-
-{pmore}If you want to perform tests that are usually run with {cmd:suest},
-such as non-nested models, tests using alternative specifications of the variables,
-or tests on different groups, you can replicate it manually, as described 
-{browse "http://www.stata.com/statalist/archive/2009-11/msg01485.html":here}.
-{p_end}
-
-{marker remarks}{...}
-
-{title:Possible Pitfalls and Common Mistakes}
-
-{p2col 8 12 12 2: 1.}(note: as of version 2.1, the constant is no longer reported) Ignore the constant; it doesn't tell you much. If you want to use descriptive stats, that's what the {opt sum:marize()} and {cmd:estat summ} commands are for.
-Even better, use {opt noconstant} to drop it (although it's not really dropped as it never existed on the first place!){p_end}
-{p2col 8 12 12 2: 2.}Think twice before saving the fixed effects. They are probably inconsistent / not identified and you will likely be using them wrong.{p_end}
-{p2col 8 12 12 2: 3.}(note: as of version 3.0 singletons are dropped by default) It's good practice to drop singletons. {opt dropsi:ngleton} is your friend.{p_end}
-{p2col 8 12 12 2: 4.}If you use {opt vce(robust)}, be sure that your {it:other} dimension is not "fixed" but grows with N, or your SEs will be wrong.{p_end}
-{p2col 8 12 12 2: 5.}If you use {opt vce(cluster ...)}, check that your number of clusters is high enough (50+ is a rule of thumb). If not, you are making the SEs even worse!{p_end}
-{p2col 8 12 12 2: 6.}The panel variables (absvars) should probably be nested within the clusters (clustervars) due to the within-panel correlation induced by the FEs.
-(this is not the case for *all* the absvars, only those that are treated as growing as N grows){p_end}
-{p2col 8 12 12 2: 7.}If you run analytic or probability weights,
-you are responsible for ensuring that the weights stay
-constant within each unit of a fixed effect (e.g. individual),
-or that it is correct to allow varying-weights for that case.
-{p_end}
-{p2col 8 12 12 2: 8.}Be aware that adding several HDFEs is not a panacea.
-The first limitation is that it only uses within variation (more than acceptable if you have a large enough dataset).
-The second and subtler limitation occurs if the fixed effects are themselves outcomes of the variable of interest (as crazy as it sounds).
-For instance, imagine a regression where we study the effect of past corporate fraud on future firm performance.
-We add firm, CEO and time fixed-effects (standard practice). This introduces a serious flaw: whenever a fraud event is discovered,
-i) future firm performance will suffer, and ii) a CEO turnover will likely occur.
-Moreover, after fraud events, the new CEOs are usually specialized in dealing with the aftershocks of such events
-(and are usually accountants or lawyers).
-The fixed effects of these CEOs will also tend to be quite low, as they tend to manage firms with very risky outcomes.
-Therefore, the regressor (fraud) affects the fixed effect (identity of the incoming CEO).
-Adding particularly low CEO fixed effects will then overstate the performance of the firm,
-and thus {it:understate} the negative effects of fraud on future firm performance.{p_end}
-
-{title:Missing Features}
-
-{phang}(If you are interested in discussing these or others, feel free to {help multimport##contact:contact me})
-
-{phang}Code, medium term:
-
-{p2col 8 12 12 2: -}Complete GT preconditioning (v4){p_end}
-{p2col 8 12 12 2: -}Improve algorithm that recovers the fixed effects (v5){p_end}
-{p2col 8 12 12 2: -}Improve statistics and tests related to the fixed effects (v5){p_end}
-{p2col 8 12 12 2: -}Implement a -bootstrap- option in DoF estimation (v5){p_end}
-
-{phang}Code, long term:
-
-{p2col 8 12 12 2: -}The interaction with cont vars (i.a#c.b) may suffer from numerical accuracy issues, as we are dividing by a sum of squares{p_end}
-{p2col 8 12 12 2: -}Calculate exact DoF adjustment for 3+ HDFEs (note: not a problem with cluster VCE when one FE is nested within the cluster){p_end}
-{p2col 8 12 12 2: -}More postestimation commands (lincom? margins?){p_end}
-
-{phang}Theory:
-
-{p2col 8 12 12 2: -}Add a more thorough discussion on the possible identification issues{p_end}
-{p2col 8 12 12 2: -}Find out a way to use multimport iteratively with CUE
-(right now only OLS/2SLS/GMM2S/LIML give the exact same results){p_end}
-{p2col 8 12 12 2: -}Not sure if I should add an F-test for the absvars in the vce(robust) and vce(cluster) cases.
-Discussion on e.g. -areg- (methods and formulas) and textbooks suggests not;
-on the other hand, there may be alternatives:
-{it:{browse "http://www.socialsciences.manchester.ac.uk/disciplines/economics/research/discussionpapers/pdf/EDP-1124.pdf" :A Heteroskedasticity-Robust F-Test Statistic for Individual Effects}}{p_end}
 
 {marker examples}{...}
 {title:Examples}
