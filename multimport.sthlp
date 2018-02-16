@@ -71,20 +71,9 @@ The program will import and append all listed files, generating a new variable {
 Additional optiones may be passed to {helpb import:[D] import {it:import_method}} and {helpb append:[D] append} using {opt importoptions(import_method_opts)} and {opt appendoptions(append_opts)}, respectively.
 
 {pstd}
-Additional files may be specifically included with the {opt include(file1 [file2 ...])} option, and specific files may be excludede via the {opt exclude(file1 [file2 ...])} option.
+Additional files may be specifically included with the {opt include(file1 [file2 ...])} option, and specific files may be excluded via the {opt exclude(file1 [file2 ...])} option.
 
-{pstd}
-{cmd:multimport} is a generalization of {help areg} (and {help xtreg:xtreg,fe}, {help xtivreg:xtivreg,fe}) for multiple levels of fixed effects
-(including heterogeneous slopes), alternative estimators (2sls, gmm2s, liml), and additional robust standard errors (multi-way clustering, HAC standard errors, etc).{p_end}
 
-{pstd}Additional features include:{p_end}
-
-{p2col 8 12 12 2: a)}A novel and robust algorithm to efficiently absorb the fixed effects (extending the work of Guimaraes and Portugal, 2010).{p_end}
-{p2col 8 12 12 2: b)}Coded in Mata, which in most scenarios makes it even faster than {it:areg} and {it:xtreg} for a single fixed effect (see benchmarks on the Github page).{p_end}
-{p2col 8 12 12 2: c)}Can save the point estimates of the fixed effects ({it:caveat emptor}: the fixed effects may not be identified, see the {help multimport##references:references}).{p_end}
-{p2col 8 12 12 2: d)}Calculates the degrees-of-freedom lost due to the fixed effects
-(note: beyond two levels of fixed effects, this is still an open problem, but we provide a conservative approximation).{p_end}
-{p2col 8 12 12 2: e)}Iteratively removes singleton groups by default, to avoid biasing the standard errors (see ancillary document).{p_end}
 
 {marker options}{...}
 {title:Options}
@@ -700,120 +689,11 @@ on the other hand, there may be alternatives:
 {synopt:{cmd:e(sample)}}marks estimation sample{p_end}
 {p2colreset}{...}
 
+
 {marker contact}{...}
 {title:Author}
 
-{pstd}Sergio Correia{break}
-Fuqua School of Business, Duke University{break}
-Email: {browse "mailto:sergio.correia@duke.edu":sergio.correia@duke.edu}
-{p_end}
-
-{marker user_guide}{...}
-{title:User Guide}
-
-{pstd}
-A copy of this help file, as well as a more in-depth user guide is in development and will be available at {browse "http://scorreia.com/multimport"}.{p_end}
-
-{marker updates}{...}
-{title:Latest Updates}
-
-{pstd}
-{cmd:multimport} is updated frequently, and upgrades or minor bug fixes may not be immediately available in SSC.
-To check or contribute to the latest version of multimport, explore the
-{browse "https://github.com/sergiocorreia/multimport":Github repository}.
-Bugs or missing features can be discussed through email or at the {browse "https://github.com/sergiocorreia/multimport/issues":Github issue tracker}.{p_end}
-
-{pstd}
-To see your current version and installed dependencies, type {cmd:multimport, version}
-{p_end}
-
-{marker acknowledgements}{...}
-{title:Acknowledgements}
-
-{pstd}
-This package wouldn't have existed without the invaluable feedback and contributions of Paulo Guimaraes,  Amine Ouazad, Mark Schaffer and Kit Baum. Also invaluable are the great bug-spotting abilities of many users.{p_end}
-
-{pstd}In addition, {it:multimport} is build upon important contributions from the Stata community:{p_end}
-
-{phang}{browse "https://ideas.repec.org/c/boc/bocode/s457101.html":reg2hdfe}, from Paulo Guimaraes,
-and {browse "https://ideas.repec.org/c/boc/bocode/s456942.html":a2reg} from Amine Ouazad,
- were the inspiration and building blocks on which multimport was built.{p_end}
- 
-{phang}{browse "http://www.repec.org/bocode/i/ivreg2.html":ivreg2}, by Christopher F Baum, Mark E Schaffer and Steven Stillman, is the package used by default for instrumental-variable regression.{p_end}
-
-{phang}{browse "https://ideas.repec.org/c/boc/bocode/s457689.html":avar} by Christopher F Baum and Mark E Schaffer, is the package used for estimating the HAC-robust standard errors of ols regressions.{p_end}
-
-{phang}{browse "http://econpapers.repec.org/software/bocbocode/s456797.htm":tuples} by Joseph Lunchman and Nicholas Cox, is used when computing standard errors with multi-way clustering (two or more clustering variables).{p_end}
-
-{marker references}{...}
-{title:References}
-
-{p 0 0 2}
-The algorithm underlying multimport is a generalization of the works by:
-
-{phang}
-Paulo Guimaraes and Pedro Portugal. "A Simple Feasible Alternative Procedure to Estimate
-Models with High-Dimensional Fixed Effects".
-{it:Stata Journal, 10(4), 628-649, 2010.}
-{browse "http://www.stata-journal.com/article.html?article=st0212":[link]}
-{p_end}
-
-{phang}
-Simen Gaure. "OLS with Multiple High Dimensional Category Dummies".
-{it:Memorandum 14/2010, Oslo University, Department of Economics, 2010.}
-{browse "https://ideas.repec.org/p/hhs/osloec/2010_014.html":[link]}
-{p_end}
-
-{p 0 0 2}
-It addresses many of the limitation of previous works, such as possible lack of convergence, arbitrary slow convergence times,
-and being limited to only two or three sets of fixed effects (for the first paper).
-The paper explaining the specifics of the algorithm is a work-in-progress and available upon request.
-
-{p 0 0 0}
-If you use this program in your research, please cite either
-the {browse "https://ideas.repec.org/c/boc/bocode/s457874.html":REPEC entry}
-or the aforementioned papers.{p_end}
-
-{title:Additional References}
-
-{p 0 0 0}
-For details on the Aitken acceleration technique employed, please see "method 3" as described by:
-
-{phang}
-Macleod, Allan J. "Acceleration of vector sequences by multi-dimensional Delta-2 methods."
-{it:Communications in Applied Numerical Methods 2.4 (1986): 385-392.}
-{p_end}
-
-{p 0 0 0}
-For the rationale behind interacting fixed effects with continuous variables, see:
-
-{phang}
-Duflo, Esther. "The medium run effects of educational expansion: Evidence from a large school construction program in Indonesia."
-{it:Journal of Development Economics 74.1 (2004): 163-197.}{browse "http://www.sciencedirect.com/science/article/pii/S0304387803001846": [link]}
-{p_end}
-
-{p 0 0 0}
-Also see:
-
-{phang}Abowd, J. M., R. H. Creecy, and F. Kramarz 2002.
-Computing person and firm effects using linked longitudinal employer-employee data.
-{it:Census Bureau Technical Paper TP-2002-06.}
-{p_end}
-
-{phang}
-Cameron, A. Colin & Gelbach, Jonah B. & Miller, Douglas L., 2011.
-"Robust Inference With Multiway Clustering,"
-{it:Journal of Business & Economic Statistics, American Statistical Association, vol. 29(2), pages 238-249.}
-{p_end}
-
-{phang}
-Gormley, T. & Matsa, D. 2014.
-"Common errors: How to (and not to) control for unobserved heterogeneity."
-{it:The Review of Financial Studies, vol. 27(2), pages 617-661.}
-{p_end}
-
-{phang}
-Mittag, N. 2012.
-"New methods to estimate models with large sets of fixed effects with an application to matched employer-employee data from Germany."
-{it:{browse "http://doku.iab.de/fdz/reporte/2012/MR_01-12_EN.pdf":FDZ-Methodenreport 02/2012}.} 
+{pstd}Alvaro Carril{break}
+National Bureau of Economic Research{break}
+Email: {browse "mailto:alvaroc@nber.org":alvaroc@nber.org}
 {p_end}
