@@ -54,8 +54,11 @@ foreach ext of local extensions {
 	local files `files' `"`add'"'
 }
 
+// Sort elements in list
+local files : list sort files
+
 // Of all files in directory(), use only those in include()
-if "`include'" != "" local files : list files & include
+if "`include'" != "" local files : list include & files
 
 // Exclude any specific files
 local files : list files - exclude
@@ -105,7 +108,7 @@ foreach f of local files {
 	gen _filename = `i'
 	// Append with accumulated data
 	append using `alldata' , `appendoptions'
-	qui save `alldata', replace 
+	qui save `alldata', replace
 }
 // Define and apply value label to _filename
 label define _filename `valuelabs'
