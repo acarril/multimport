@@ -1,5 +1,6 @@
 *! 1.0 Alvaro Carril 14feb2018
 program define multimport, rclass
+version 11
 syntax anything(name=importmethod id="import_method") [using], ///
 	[ ///
 		EXTensions(string) ///
