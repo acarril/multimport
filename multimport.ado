@@ -117,6 +117,7 @@ label define _filename `valuelabs'
 label values _filename _filename
 
 return local files `files'
+if "`directory'" == "" local directory .
 return local directory `directory'
 
 end
