@@ -31,7 +31,7 @@
 
 {p 8 15 2} {cmd:multimport}
 {cmd:}{it:{help import:import_method}}
-{cmd:,} [{opth dir:ectory(dir:filespec)} {opth ext:ension(multimport##extension:ext1 [ext2 ...])} {opth in:clude(filename:file1 [file2 ...])} {help multimport##options:options}] {p_end}
+{cmd:,} [{opth dir:ectory(dir:filespec)} {opth ext:ension(multimport##extension:ext1 [ext2 ...])} {opth in:clude(filename:file1 [file2 ...])} {help multimport##options:{it:options}}] {p_end}
 
 {phang}
 {it:import_method} is the method to use for reading non-Stata data into memory (see {helpb import:[D] import}); currently {cmd:delimited} and {cmd:excel} are supported{p_end}
@@ -44,9 +44,9 @@
 {synoptset 36 tabbed}{...}
 {synopthdr}
 {synoptline}
-{p2coldent:* {opth dir:ectory(dir:filespec)}}directory of files to import; if not specified, it defaults to the current working directory{p_end}
+{synopt : {opth dir:ectory(dir:filespec)}}directory of files to import; if not specified, it defaults to the current working directory{p_end}
 {synopt : {opth ext:ensions(multimport##extension:ext1 [ext2 ...])}}override file extension(s) scanned in {opt directory(filespec)}; if not specified, sensible defaults are inferred from {it:import_method}{p_end}
-{p2coldent:* {opth inc:lude(filename:file1 [file2 ...])}}specific filenames to import{p_end}
+{synopt : {opth inc:lude(filename:file1 [file2 ...])}}specific filenames to import{p_end}
 {synopt : {opth exc:lude(filename:file1 [file2 ...])}}specific filenames to exclude from import{p_end}
 {synopt : {opth import:options(import:import_method_opts)}}pass options to {helpb import:[D] import {it:import_method}}{p_end}
 {synopt : {opth append:options(append:append_opts)}}pass options to {helpb append:[D] append}{p_end}
@@ -54,7 +54,6 @@
 {synopt :{opt clear}}replace data in memory{p_end}
 {synoptline}
 {p2colreset}{...}
-{p 4 6 2}* {opt directory(filespec)} and/or {opt include(file1 [file2 ...])} are required.{p_end}
 
 
 {marker description}{...}
