@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.0 15feb2018}{...}
+{* *! version 1.1 09apr2018}{...}
 {vieweralsosee "[R] areg" "help areg"}{...}
 {vieweralsosee "[R] xtreg" "help xtreg"}{...}
 {vieweralsosee "[R] ivregress" "help ivregress"}{...}
@@ -121,62 +121,39 @@ For example, it can be used to keep specified variables from appending dataset(s
 
 
 {marker examples}{...}
-{title:Examples}
+{title:Examples - delimited files}
 
-{hline}
-{pstd}Setup{p_end}
-{phang2}{cmd:. sysuse auto}{p_end}
+{pstd}Setup - Use NHANES II data and export delimited files by region number{p_end}
+{phang2}{cmd:. use http://www.stata-press.com/data/r14/nhanes2.dta}{p_end}
+{phang2}{cmd:. levelsof region}{p_end}
+{phang2}{cmd:. foreach r in `r(levels)' {c -(}}{p_end}
+{phang2}{cmd:.   export delimited using nhanes_reg`r' if region == `r'}{p_end}
+{phang2}{cmd:. {c )-}}{p_end}
 
-{pstd}Simple case - one fixed effect{p_end}
-{phang2}{cmd:. multimport price weight length, absorb(rep78)}{p_end}
-{hline}
+{pstd}Simple use - Import all delimited files in current working directory{p_end}
+{phang2}{cmd:. multimport delimited, clear}{p_end}
 
-{pstd}As above, but also compute clustered standard errors{p_end}
-{phang2}{cmd:. multimport price weight length, absorb(rep78) vce(cluster rep78)}{p_end}
-{hline}
+{pstd}As above, this time explicitly specifying the current directory and skipping confirmation prompt.{p_end}
+{phang2}{cmd:. multimport delimited, clear directory(.) force}{p_end}
 
-{pstd}Two and three sets of fixed effects{p_end}
-{phang2}{cmd:. webuse nlswork}{p_end}
-{phang2}{cmd:. multimport ln_w grade age ttl_exp tenure not_smsa south , absorb(idcode year)}{p_end}
-{phang2}{cmd:. multimport ln_w grade age ttl_exp tenure not_smsa south , absorb(idcode year occ)}{p_end}
-{hline}
+{pstd}Import only specific filenames.{p_end}
+{phang2}{cmd:. multimport delimited, clear include(nhanes_reg1.csv nhanes_reg4.csv)}{p_end}
 
-{title:Advanced examples}
 
-{pstd}Save the FEs as variables{p_end}
-{phang2}{cmd:. multimport ln_w grade age ttl_exp tenure not_smsa south , absorb(FE1=idcode FE2=year)}{p_end}
+{title:Examples - Excel files}
 
-{pstd}Report nested F-tests{p_end}
-{phang2}{cmd:. multimport ln_w grade age ttl_exp tenure not_smsa south , absorb(idcode year) nested}{p_end}
+{pstd}Setup - Use NHANES II data and export Excel (*.xls) files by region number{p_end}
+{phang2}{cmd:. use http://www.stata-press.com/data/r14/nhanes2.dta}{p_end}
+{phang2}{cmd:. levelsof region}{p_end}
+{phang2}{cmd:. foreach r in `r(levels)' {c -(}}{p_end}
+{phang2}{cmd:.   export excel using nhanes_reg`r' if region == `r'}{p_end}
+{phang2}{cmd:. {c )-}}{p_end}
 
-{pstd}Do AvgE instead of absorb() for one FE{p_end}
-{phang2}{cmd:. multimport ln_w grade age ttl_exp tenure not_smsa south , absorb(idcode year) avge(occ)}{p_end}
-{phang2}{cmd:. multimport ln_w grade age ttl_exp tenure not_smsa south , absorb(idcode year) avge(AvgByOCC=occ)}{p_end}
+{pstd}Import all Excel files except one{p_end}
+{phang2}{cmd:. multimport excel, clear exclude(nhanes_reg1.xls)}{p_end}
 
-{pstd}Check that FE coefs are close to 1.0{p_end}
-{phang2}{cmd:. multimport ln_w grade age ttl_exp tenure not_smsa , absorb(idcode year) check}{p_end}
-
-{pstd}Save first mobility group{p_end}
-{phang2}{cmd:. multimport ln_w grade age ttl_exp tenure not_smsa , absorb(idcode occ) group(mobility_occ)}{p_end}
-
-{pstd}Factor interactions in the independent variables{p_end}
-{phang2}{cmd:. multimport ln_w i.grade#i.age ttl_exp tenure not_smsa , absorb(idcode occ)}{p_end}
-
-{pstd}Interactions in the absorbed variables (notice that only the {it:#} symbol is allowed){p_end}
-{phang2}{cmd:. multimport ln_w grade age ttl_exp tenure not_smsa , absorb(idcode#occ)}{p_end}
-
-{pstd}Interactions in both the absorbed and AvgE variables (again, only the {it:#} symbol is allowed){p_end}
-{phang2}{cmd:. multimport ln_w grade age ttl_exp not_smsa , absorb(idcode#occ) avge(tenure#occ)}{p_end}
-
-{pstd}IV regression{p_end}
-{phang2}{cmd:. sysuse auto}{p_end}
-{phang2}{cmd:. multimport price weight (length=head), absorb(rep78)}{p_end}
-{phang2}{cmd:. multimport price weight (length=head), absorb(rep78) first}{p_end}
-{phang2}{cmd:. multimport price weight (length=head), absorb(rep78) ivsuite(ivregress)}{p_end}
-
-{pstd}Factorial interactions{p_end}
-{phang2}{cmd:. multimport price weight (length=head), absorb(rep78)}{p_end}
-{phang2}{cmd:. multimport price weight length, absorb(rep78 turn##c.price)}{p_end}
+{pstd}Import all Excel data as strings{p_end}
+{phang2}{cmd:. multimport excel, clear importoptions(allstring)}{p_end}
 
 
 {marker results}{...}
