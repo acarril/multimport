@@ -23,10 +23,10 @@ if "`importmethod'" != "excel" & "`importmethod'" != "delimited" {
 }
 
 // Assert that either directory() or include() are specified
-if "`directory'" == "" & `"`include'"' == "" {
+/* if "`directory'" == "" & `"`include'"' == "" {
 	di as error "you must either specify a directory() or specific files to include()"
 	exit 198
-}
+} */
 
 // Check that current data is saved or that 'clear' is specified
 local clearpos = strpos(`"`importoptions'"', "clear")
@@ -52,7 +52,8 @@ if "`extensions'" == "" {
 // Parse files to import, collecting all files with `extensions' of `directory'
 foreach ext of local extensions {
 	local add : dir "`directory'" files "*.`ext'", respectcase
-	local files `files' `"`add'"'
+	local Nadd : list sizeof add
+	if `Nadd' > 0 local files `files' `"`add'"'
 }
 
 // Sort elements in list
